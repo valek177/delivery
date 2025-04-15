@@ -6,7 +6,7 @@ type Config struct {
 	DbPort                    string
 	DbUser                    string
 	DbPassword                string
-	DbDbName                  string
+	DbName                    string
 	DbSslMode                 string
 	GeoServiceGrpcHost        string
 	KafkaHost                 string

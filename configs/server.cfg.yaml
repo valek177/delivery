@@ -1,6 +1,6 @@
 # yaml-language-servers: ...
 package: servers
-output: pkg/servers/servers.gen.go
+output: generated/servers/servers.gen.go
 generate:
   echo-server: true
   embedded-spec: true

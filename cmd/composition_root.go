@@ -1,13 +1,9 @@
 package cmd
 
-import (
-	"context"
-)
-
 type CompositionRoot struct {
 }
 
-func NewCompositionRoot(ctx context.Context) CompositionRoot {
+func NewCompositionRoot(_ Config) CompositionRoot {
 	app := CompositionRoot{}
 	return app
 }
