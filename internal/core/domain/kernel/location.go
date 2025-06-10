@@ -8,26 +8,26 @@ import (
 )
 
 const (
-	MIN_X = 1
-	MIN_Y = 1
-	MAX_X = 10
-	MAX_Y = 10
+	minX = 1
+	minY = 1
+	maxX = 10
+	maxY = 10
 )
 
 type Location struct {
-	x uint8
-	y uint8
+	x int
+	y int
 
 	isSet bool
 }
 
-func NewLocation(x, y uint8) (Location, error) {
-	if x < MIN_X || x > MAX_X {
-		return Location{}, errs.NewValueIsInvalidError("x")
+func NewLocation(x, y int) (Location, error) {
+	if x < minX || x > maxX {
+		return Location{}, errs.NewValueIsOutOfRangeError("x", x, minX, maxX)
 	}
 
-	if y < MIN_Y || x > MAX_Y {
-		return Location{}, errs.NewValueIsInvalidError("y")
+	if y < minY || x > maxY {
+		return Location{}, errs.NewValueIsOutOfRangeError("y", y, minY, maxY)
 	}
 
 	return Location{
@@ -38,8 +38,8 @@ func NewLocation(x, y uint8) (Location, error) {
 }
 
 func NewRandomLocation() Location {
-	x := uint8(rand.Intn(MAX_X+1-MIN_X) + MIN_X)
-	y := uint8(rand.Intn(MAX_Y+1-MIN_Y) + MIN_Y)
+	x := minX + rand.Intn(maxX+1-minX)
+	y := minY + rand.Intn(maxY+1-minY)
 
 	return Location{
 		x:     x,
@@ -48,11 +48,11 @@ func NewRandomLocation() Location {
 	}
 }
 
-func (l Location) X() uint8 {
+func (l Location) X() int {
 	return l.x
 }
 
-func (l Location) Y() uint8 {
+func (l Location) Y() int {
 	return l.y
 }
 
@@ -61,13 +61,11 @@ func (l Location) Equals(other Location) bool {
 }
 
 func (l Location) IsEmpty() bool {
-}
-
-func (l Location) IsValid() bool {
+	return !l.isSet
 }
 
 func (l Location) DistanceTo(target Location) (int, error) {
-	if !target.IsValid() {
+	if target.IsEmpty() {
 		return 0, errs.NewValueIsRequiredError("location")
 	}
 	return int(
