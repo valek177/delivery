@@ -1,6 +1,7 @@
 package kernel
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 
@@ -41,11 +42,14 @@ func NewRandomLocation() Location {
 	x := minX + rand.Intn(maxX+1-minX)
 	y := minY + rand.Intn(maxY+1-minY)
 
-	return Location{
-		x:     x,
-		y:     y,
-		isSet: true,
+	location, err := NewLocation(x, y)
+	if err != nil {
+		panic(fmt.Sprintf(
+			"unable to create random location with x: %d, y: %d, err: %v", x, y, err,
+		))
 	}
+
+	return location
 }
 
 func (l Location) X() int {
