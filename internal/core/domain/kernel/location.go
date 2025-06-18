@@ -77,3 +77,11 @@ func (l Location) DistanceTo(target Location) (int, error) {
 			math.Abs(float64(l.y-target.Y())),
 	), nil
 }
+
+func MinLocation() Location {
+	location, err := NewLocation(minX, minY)
+	if err != nil {
+		panic("invalid min location configuration")
+	}
+	return location
+}
