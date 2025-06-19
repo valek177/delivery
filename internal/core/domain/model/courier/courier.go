@@ -41,7 +41,8 @@ func NewCourier(name string, speed int, location kernel.Location) (*Courier, err
 	storagePlace, err := NewStoragePlace(courierDefaultStoragePlaceName,
 		courierDefaultStoragePlaceVolume)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create courier: cannot create storage place: %v", err)
+		return nil,
+			fmt.Errorf("cannot create courier: cannot create storage place: %v", err)
 	}
 
 	return &Courier{
