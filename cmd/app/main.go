@@ -1,13 +1,15 @@
 package main
 
 import (
-	"delivery/cmd"
 	"fmt"
+	"net/http"
+	"os"
+
+	"delivery/cmd"
+
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
-	"net/http"
-	"os"
 )
 
 func main() {
@@ -16,6 +18,8 @@ func main() {
 	app := cmd.NewCompositionRoot(
 		configs,
 	)
+	defer app.CloseAll()
+
 	startWebServer(app, configs.HttpPort)
 }
 
@@ -45,7 +49,7 @@ func goDotEnvVariable(key string) string {
 	return os.Getenv(key)
 }
 
-func startWebServer(_ cmd.CompositionRoot, port string) {
+func startWebServer(_ *cmd.CompositionRoot, port string) {
 	e := echo.New()
 	e.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Healthy")
