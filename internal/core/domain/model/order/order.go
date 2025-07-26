@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 
 	"delivery/internal/core/domain/kernel"
+	"delivery/internal/pkg/ddd"
 	"delivery/internal/pkg/errs"
 )
 
@@ -15,6 +16,8 @@ var (
 )
 
 type Order struct {
+	baseAggregate *ddd.BaseAggregate[uuid.UUID]
+
 	id        uuid.UUID
 	courierID *uuid.UUID
 	location  kernel.Location
@@ -33,11 +36,36 @@ func NewOrder(orderID uuid.UUID, location kernel.Location, volume int) (*Order, 
 		return nil, errs.NewValueIsRequiredError("volume")
 	}
 	return &Order{
-		id:       orderID,
-		location: location,
-		volume:   volume,
-		status:   StatusCreated,
+		baseAggregate: ddd.NewBaseAggregate(uuid.New()),
+		id:            orderID,
+		location:      location,
+		volume:        volume,
+		status:        StatusCreated,
 	}, nil
+}
+
+func RestoreOrder(id uuid.UUID, courierID *uuid.UUID, location kernel.Location, volume int,
+	status Status,
+) *Order {
+	return &Order{
+		baseAggregate: ddd.NewBaseAggregate(id),
+		courierID:     courierID,
+		location:      location,
+		volume:        volume,
+		status:        status,
+	}
+}
+
+func (o *Order) ClearDomainEvents() {
+	o.baseAggregate.ClearDomainEvents()
+}
+
+func (o *Order) GetDomainEvents() []ddd.DomainEvent {
+	return o.baseAggregate.GetDomainEvents()
+}
+
+func (o *Order) RaiseDomainEvent(event ddd.DomainEvent) {
+	o.baseAggregate.RaiseDomainEvent(event)
 }
 
 func (o *Order) ID() uuid.UUID {

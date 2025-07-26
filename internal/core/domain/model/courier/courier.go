@@ -9,6 +9,7 @@ import (
 
 	"delivery/internal/core/domain/kernel"
 	"delivery/internal/core/domain/model/order"
+	"delivery/internal/pkg/ddd"
 	"delivery/internal/pkg/errs"
 )
 
@@ -20,6 +21,8 @@ const (
 )
 
 type Courier struct {
+	baseAggregate *ddd.BaseAggregate[uuid.UUID]
+
 	id            uuid.UUID
 	name          string
 	speed         int
@@ -46,14 +49,27 @@ func NewCourier(name string, speed int, location kernel.Location) (*Courier, err
 	}
 
 	return &Courier{
-		id:       uuid.New(),
-		name:     name,
-		speed:    speed,
-		location: location,
+		baseAggregate: ddd.NewBaseAggregate(uuid.New()),
+		id:            uuid.New(),
+		name:          name,
+		speed:         speed,
+		location:      location,
 		storagePlaces: []*StoragePlace{
 			storagePlace,
 		},
 	}, nil
+}
+
+func RestoreCourier(id uuid.UUID, name string, speed int, location kernel.Location,
+	storagePlaces []*StoragePlace,
+) *Courier {
+	return &Courier{
+		baseAggregate: ddd.NewBaseAggregate(id),
+		name:          name,
+		speed:         speed,
+		location:      location,
+		storagePlaces: storagePlaces,
+	}
 }
 
 func (c *Courier) Equals(other *Courier) bool {
@@ -62,6 +78,18 @@ func (c *Courier) Equals(other *Courier) bool {
 	}
 
 	return other.id == c.id
+}
+
+func (c *Courier) ClearDomainEvents() {
+	c.baseAggregate.ClearDomainEvents()
+}
+
+func (c *Courier) GetDomainEvents() []ddd.DomainEvent {
+	return c.baseAggregate.GetDomainEvents()
+}
+
+func (c *Courier) RaiseDomainEvent(event ddd.DomainEvent) {
+	c.baseAggregate.RaiseDomainEvent(event)
 }
 
 func (c *Courier) ID() uuid.UUID {
