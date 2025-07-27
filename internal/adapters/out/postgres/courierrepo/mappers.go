@@ -22,7 +22,7 @@ func DomainToDTO(aggregate *courier.Courier) CourierDTO {
 			OrderID:     stPlace.OrderID(),
 			Name:        stPlace.Name(),
 			TotalVolume: stPlace.TotalVolume(),
-			// CourierID:   aggregate.ID(),
+			CourierID:   aggregate.ID(),
 		}
 		courierDTO.StoragePlaces = append(courierDTO.StoragePlaces, storagePlaceDTO)
 	}

@@ -9,7 +9,7 @@ type CourierDTO struct {
 	Name          string
 	Speed         int
 	Location      LocationDTO        `gorm:"embedded;embeddedPrefix:location_"`
-	StoragePlaces []*StoragePlaceDTO `gorm:"foreignKey:CourierID"`
+	StoragePlaces []*StoragePlaceDTO `gorm:"foreignKey:CourierID;constraint:OnDelete:CASCADE;"`
 }
 
 type StoragePlaceDTO struct {
@@ -17,6 +17,7 @@ type StoragePlaceDTO struct {
 	OrderID     *uuid.UUID `gorm:"type:uuid;"`
 	Name        string
 	TotalVolume int
+	CourierID   uuid.UUID `gorm:"type:uuid;index"`
 }
 
 type LocationDTO struct {

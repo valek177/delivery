@@ -11,11 +11,13 @@ import (
 
 func StartPostgresContainer(ctx context.Context) (testcontainers.Container, string, error) {
 	req := testcontainers.ContainerRequest{
-		Image:        "postgres:13.3",
-		ExposedPorts: []string{"5433/tcp"},
+		Image: "postgres:16-alpine",
+		// Port from container (5432 by default)
+		// https://golang.testcontainers.org/features/networking/
+		ExposedPorts: []string{"5432/tcp"},
 		Env: map[string]string{
-			"POSTGRES_USER":     "username",
-			"POSTGRES_PASSWORD": "secret",
+			"POSTGRES_USER":     "testuser",
+			"POSTGRES_PASSWORD": "testpass",
 			"POSTGRES_DB":       "testdb",
 		},
 		WaitingFor: wait.ForLog("database system is ready to accept connections").
@@ -33,9 +35,10 @@ func StartPostgresContainer(ctx context.Context) (testcontainers.Container, stri
 
 	// Получаем параметры подключения
 	host, _ := postgresContainer.Host(ctx)
-	port, _ := postgresContainer.MappedPort(ctx, "5433/tcp")
+	// Mapping on container port (5432 by default)
+	port, _ := postgresContainer.MappedPort(ctx, "5432/tcp")
 
-	dsn := fmt.Sprintf("postgres://username:secret@%s:%s/testdb?sslmode=disable", host, port.Port())
+	dsn := fmt.Sprintf("postgres://testuser:testpass@%s:%s/testdb?sslmode=disable", host, port.Port())
 
 	return postgresContainer, dsn, nil
 }

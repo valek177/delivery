@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"delivery/internal/adapters/out/postgres/courierrepo"
@@ -24,8 +23,6 @@ func setupTest(t *testing.T) (context.Context, *gorm.DB, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-
-	fmt.Println("cont", postgresContainer)
 
 	// Подключаемся к БД через Gorm
 	db, err := gorm.Open(postgresgorm.Open(dsn), &gorm.Config{})
@@ -62,7 +59,7 @@ func Test_CourierRepositoryAddCourierOk(t *testing.T) {
 
 	// Вызываем Add
 	location := kernel.MinLocation()
-	courierAggregate, err := courier.NewCourier("Biker", 2, location)
+	courierAggregate, err := courier.NewCourier("Car", 5, location)
 	assert.NoError(t, err)
 	err = uow.CourierRepository().Add(ctx, courierAggregate)
 	assert.NoError(t, err)
