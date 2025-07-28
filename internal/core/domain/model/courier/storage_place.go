@@ -3,6 +3,7 @@ package courier
 import (
 	"fmt"
 
+	"delivery/internal/pkg/ddd"
 	"delivery/internal/pkg/errs"
 
 	"github.com/google/uuid"
@@ -16,6 +17,8 @@ var (
 )
 
 type StoragePlace struct {
+	baseEntity *ddd.BaseEntity[uuid.UUID]
+
 	id          uuid.UUID
 	name        string
 	totalVolume int
@@ -35,6 +38,17 @@ func NewStoragePlace(name string, totalVolume int) (*StoragePlace, error) {
 		name:        name,
 		totalVolume: totalVolume,
 	}, nil
+}
+
+func RestoreStoragePlace(id uuid.UUID, name string, totalVolume int,
+	orderID *uuid.UUID,
+) *StoragePlace {
+	return &StoragePlace{
+		baseEntity:  ddd.NewBaseEntity(id),
+		name:        name,
+		totalVolume: totalVolume,
+		orderID:     orderID,
+	}
 }
 
 func (s *StoragePlace) Equals(other *StoragePlace) bool {
