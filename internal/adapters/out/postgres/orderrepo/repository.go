@@ -3,7 +3,6 @@ package orderrepo
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"delivery/internal/adapters/out/postgres/courierrepo"
 	"delivery/internal/core/domain/model/order"
@@ -117,10 +116,7 @@ func (r *Repository) GetFirstInCreatedStatus(ctx context.Context) (*order.Order,
 		return nil, result.Error
 	}
 
-	fmt.Println("DTO VVVV ", dto.ID)
-
 	aggregate := DtoToDomain(dto)
-	fmt.Println("aggregeate ", aggregate.ID())
 	return aggregate, nil
 }
 

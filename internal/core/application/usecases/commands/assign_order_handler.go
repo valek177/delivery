@@ -3,7 +3,6 @@ package commands
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"delivery/internal/core/domain/services"
 	"delivery/internal/core/ports"
@@ -63,8 +62,6 @@ func (ch *assignOrderCommandHandler) Handle(ctx context.Context, command AssignO
 	if len(freeCouriers) == 0 {
 		return errors.New("no free couriers")
 	}
-
-	fmt.Println("ORE", createdOrder.ID())
 
 	courier, err := ch.orderDispatcher.Dispatch(createdOrder, freeCouriers)
 	if err != nil {

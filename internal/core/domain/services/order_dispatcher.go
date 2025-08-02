@@ -38,8 +38,6 @@ func (d *orderDispatcher) Dispatch(order *orderModel.Order, couriers []*courier.
 		return nil, err
 	}
 
-	fmt.Println("order", order.ID())
-
 	err = courier.TakeOrder(order)
 	if err != nil {
 		return nil, err
@@ -58,21 +56,17 @@ func (d *orderDispatcher) bestCourier(order *orderModel.Order, couriers []*couri
 	minTime := math.MaxFloat64
 	var bestCourier *courier.Courier
 
-	fmt.Println("couriers", couriers)
-
 	for _, courier := range couriers {
 		canTake, err := courier.CanTakeOrder(order)
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("can take", canTake)
 
 		if !canTake {
 			continue
 		}
 
 		time, err := courier.CalculateTimeToLocation(order.Location())
-		fmt.Println("time ", time)
 		if err != nil {
 			return nil, err
 		}
@@ -81,7 +75,6 @@ func (d *orderDispatcher) bestCourier(order *orderModel.Order, couriers []*couri
 			bestCourier = courier
 		}
 	}
-	fmt.Println("best couriers", bestCourier)
 
 	if bestCourier == nil {
 		return nil, fmt.Errorf("no suitable couriers")

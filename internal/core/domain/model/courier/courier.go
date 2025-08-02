@@ -154,7 +154,6 @@ func (c *Courier) TakeOrder(order *order.Order) error {
 	}
 
 	for _, place := range c.storagePlaces {
-		fmt.Println("order !!", order.ID())
 		canStore, err := place.CanStore(order.Volume())
 		if err != nil {
 			continue
