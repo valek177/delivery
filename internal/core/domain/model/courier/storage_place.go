@@ -52,11 +52,14 @@ func RestoreStoragePlace(id uuid.UUID, name string, totalVolume int,
 }
 
 func (s *StoragePlace) Equals(other *StoragePlace) bool {
-	return s.id == other.id
+	if other == nil {
+		return false
+	}
+	return s.baseEntity.Equal(other.baseEntity)
 }
 
 func (s *StoragePlace) ID() uuid.UUID {
-	return s.id
+	return s.baseEntity.ID()
 }
 
 func (s *StoragePlace) Name() string {

@@ -3,6 +3,7 @@ package queries
 import (
 	"gorm.io/gorm"
 
+	"delivery/internal/core/domain/model/order"
 	"delivery/internal/pkg/errs"
 )
 
@@ -30,7 +31,8 @@ func (q *getNotCompletedOrdersQueryHandler) Handle(query GetNotCompletedOrdersQu
 	GetNotCompletedOrdersResponse, error,
 ) {
 	var orders []NotCompletedOrdersResponse
-	result := q.db.Raw("SELECT id, location_x, location_y FROM orders WHERE status != ?").Scan(&orders)
+	result := q.db.Raw(`SELECT id, location_x, location_y FROM orders WHERE status != ?`,
+		order.StatusCompleted).Scan(&orders)
 
 	if result.Error != nil {
 		return GetNotCompletedOrdersResponse{}, result.Error

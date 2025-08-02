@@ -3,6 +3,7 @@ package orderrepo
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"delivery/internal/adapters/out/postgres/courierrepo"
 	"delivery/internal/core/domain/model/order"
@@ -111,12 +112,15 @@ func (r *Repository) GetFirstInCreatedStatus(ctx context.Context) (*order.Order,
 		First(&dto)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, errs.NewObjectNotFoundError("Free courier", nil)
+			return nil, errs.NewObjectNotFoundError("Created order", nil)
 		}
 		return nil, result.Error
 	}
 
+	fmt.Println("DTO VVVV ", dto.ID)
+
 	aggregate := DtoToDomain(dto)
+	fmt.Println("aggregeate ", aggregate.ID())
 	return aggregate, nil
 }
 
