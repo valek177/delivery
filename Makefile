@@ -7,3 +7,7 @@ build: test ## Build application
 
 test: ## Run tests
 	go test ./...
+
+server:
+	oapi-codegen -config configs/server.cfg.yaml api/openapi.yaml
+.PHONY: server

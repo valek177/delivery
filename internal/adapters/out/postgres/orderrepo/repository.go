@@ -111,7 +111,7 @@ func (r *Repository) GetFirstInCreatedStatus(ctx context.Context) (*order.Order,
 		First(&dto)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, errs.NewObjectNotFoundError("Free courier", nil)
+			return nil, errs.NewObjectNotFoundError("Created order", nil)
 		}
 		return nil, result.Error
 	}

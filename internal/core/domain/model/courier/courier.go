@@ -23,7 +23,6 @@ const (
 type Courier struct {
 	baseAggregate *ddd.BaseAggregate[uuid.UUID]
 
-	id            uuid.UUID
 	name          string
 	speed         int
 	location      kernel.Location
@@ -50,7 +49,6 @@ func NewCourier(name string, speed int, location kernel.Location) (*Courier, err
 
 	return &Courier{
 		baseAggregate: ddd.NewBaseAggregate(uuid.New()),
-		id:            uuid.New(),
 		name:          name,
 		speed:         speed,
 		location:      location,
@@ -77,7 +75,7 @@ func (c *Courier) Equals(other *Courier) bool {
 		return false
 	}
 
-	return other.id == c.id
+	return c.baseAggregate.Equal(other.baseAggregate)
 }
 
 func (c *Courier) ClearDomainEvents() {
@@ -93,7 +91,7 @@ func (c *Courier) RaiseDomainEvent(event ddd.DomainEvent) {
 }
 
 func (c *Courier) ID() uuid.UUID {
-	return c.id
+	return c.baseAggregate.ID()
 }
 
 func (c *Courier) Name() string {
@@ -127,6 +125,7 @@ func (c *Courier) CanTakeOrder(order *order.Order) (bool, error) {
 	if order == nil {
 		return false, errs.NewValueIsInvalidError("order")
 	}
+
 	for _, place := range c.storagePlaces {
 		canStore, err := place.CanStore(order.Volume())
 		if err != nil {
