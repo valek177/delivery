@@ -18,7 +18,6 @@ var (
 type Order struct {
 	baseAggregate *ddd.BaseAggregate[uuid.UUID]
 
-	id        uuid.UUID
 	courierID *uuid.UUID
 	location  kernel.Location
 	volume    int
@@ -37,7 +36,6 @@ func NewOrder(orderID uuid.UUID, location kernel.Location, volume int) (*Order, 
 	}
 	return &Order{
 		baseAggregate: ddd.NewBaseAggregate(uuid.New()),
-		id:            orderID,
 		location:      location,
 		volume:        volume,
 		status:        StatusCreated,
@@ -69,7 +67,7 @@ func (o *Order) RaiseDomainEvent(event ddd.DomainEvent) {
 }
 
 func (o *Order) ID() uuid.UUID {
-	return o.id
+	return o.baseAggregate.ID()
 }
 
 func (o *Order) CourierID() *uuid.UUID {
