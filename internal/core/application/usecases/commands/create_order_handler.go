@@ -3,7 +3,6 @@ package commands
 import (
 	"context"
 
-	"delivery/internal/core/domain/kernel"
 	"delivery/internal/core/domain/model/order"
 	"delivery/internal/core/ports"
 	"delivery/internal/pkg/errs"
@@ -17,17 +16,23 @@ var _ CreateOrderCommandHandler = &createOrderCommandHandler{}
 
 type createOrderCommandHandler struct {
 	uowFactory ports.UnitOfWorkFactory
+	geoClient  ports.GeoClient
 }
 
 func NewCreateOrderCommandHandler(
-	uowFactory ports.UnitOfWorkFactory,
+	uowFactory ports.UnitOfWorkFactory, geoClient ports.GeoClient,
 ) (CreateOrderCommandHandler, error) {
 	if uowFactory == nil {
 		return nil, errs.NewValueIsRequiredError("unitOfWork")
 	}
 
+	if geoClient == nil {
+		return nil, errs.NewValueIsRequiredError("geoClient")
+	}
+
 	return &createOrderCommandHandler{
 		uowFactory: uowFactory,
+		geoClient:  geoClient,
 	}, nil
 }
 
@@ -48,8 +53,11 @@ func (ch *createOrderCommandHandler) Handle(ctx context.Context, command CreateO
 		return nil
 	}
 
-	// Получаем геопозицию из сервиса Geo. Пока не реализовано - ставим рандом значение
-	location := kernel.NewRandomLocation()
+	// Получаем геопозицию из сервиса Geo.
+	location, err := ch.geoClient.GetGeolocation(ctx, command.Street())
+	if err != nil {
+		return err
+	}
 
 	// Изменили
 	orderAggregate, err = order.NewOrder(command.OrderID(), location, command.Volume())

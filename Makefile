@@ -11,3 +11,7 @@ test: ## Run tests
 server:
 	oapi-codegen -config configs/server.cfg.yaml api/openapi.yaml
 .PHONY: server
+
+generate-geo-client:
+	@rm -rf internal/generated/clients/geosrv
+	@protoc --go_out=internal/generated/clients --go-grpc_out=internal/generated/clients api/proto/geo_service.proto
