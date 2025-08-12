@@ -15,3 +15,7 @@ server:
 generate-geo-client:
 	@rm -rf internal/generated/clients/geosrv
 	@protoc --go_out=internal/generated/clients --go-grpc_out=internal/generated/clients api/proto/geo_service.proto
+
+generate-basket-queue:
+	@rm -rf internal/generated/queues/basketconfirmedpb
+	@protoc --go_out=internal/generated --go-grpc_out=internal/generated/queues api/proto/basket_confirmed.proto

@@ -237,7 +237,7 @@ func (c *Courier) findStoragePlaceByOrderID(orderID uuid.UUID) (*StoragePlace, e
 	}
 
 	for _, place := range c.storagePlaces {
-		if orderID == *place.OrderID() {
+		if place.OrderID() != nil && orderID == *place.OrderID() {
 			return place, nil
 		}
 	}
