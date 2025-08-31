@@ -104,5 +104,7 @@ func (o *Order) Complete() error {
 		return ErrCannotCompleteNotAssignedOrder
 	}
 	o.status = StatusCompleted
+	o.RaiseDomainEvent(NewCompletedDomainEvent(o))
+
 	return nil
 }
