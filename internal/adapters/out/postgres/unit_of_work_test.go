@@ -9,6 +9,7 @@ import (
 	"delivery/internal/core/domain/kernel"
 	"delivery/internal/core/domain/model/courier"
 	"delivery/internal/core/domain/model/order"
+	"delivery/internal/pkg/ddd"
 	"delivery/internal/pkg/testcnts"
 
 	"github.com/google/uuid"
@@ -54,7 +55,7 @@ func Test_CourierRepositoryAddCourierOk(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Создаем UnitOfWorkV2
-	uow, err := NewUnitOfWork(db)
+	uow, err := NewUnitOfWork(db, ddd.NewMediatr())
 	assert.NoError(t, err)
 
 	// Вызываем Add
@@ -80,7 +81,7 @@ func Test_OrderRepositoryAddOrderOk(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Создаем UnitOfWorkV2
-	uow, err := NewUnitOfWork(db)
+	uow, err := NewUnitOfWork(db, ddd.NewMediatr())
 	assert.NoError(t, err)
 
 	// Вызываем Add

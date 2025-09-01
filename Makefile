@@ -19,3 +19,7 @@ generate-geo-client:
 generate-basket-queue:
 	@rm -rf internal/generated/queues/basketconfirmedpb
 	@protoc --go_out=internal/generated --go-grpc_out=internal/generated/queues api/proto/basket_confirmed.proto
+
+generate-order-status:
+	@rm -rf internal/generated/queues/orderstatuschangedpb
+	@protoc --go_out=internal/generated --go-grpc_out=internal/generated/queues api/proto/order_status_changed.proto
