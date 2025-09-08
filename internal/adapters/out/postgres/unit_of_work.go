@@ -116,8 +116,7 @@ func (u *UnitOfWork) Commit(ctx context.Context) error {
 
 func (u *UnitOfWork) RollbackUnlessCommitted(ctx context.Context) {
 	if u.tx != nil && !u.committed {
-		if err := u.tx.WithContext(ctx).Rollback().Error; err != nil &&
-			!errors.Is(err, gorm.ErrInvalidTransaction) {
+		if err := u.tx.WithContext(ctx).Rollback().Error; err != nil && !errors.Is(err, gorm.ErrInvalidTransaction) {
 			log.Error(err)
 		}
 		u.clearTx()

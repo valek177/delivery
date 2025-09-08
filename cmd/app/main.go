@@ -253,15 +253,15 @@ func registerSwaggerUi(e *echo.Echo) {
 
 func startCron(compositionRoot *cmd.CompositionRoot) {
 	c := cron.New()
-	_, err := c.AddJob("@every 5s", compositionRoot.NewAssignOrdersJob())
+	_, err := c.AddJob("@every 1s", compositionRoot.NewAssignOrdersJob())
 	if err != nil {
 		log.Fatalf("ошибка при добавлении задачи: %v", err)
 	}
-	_, err = c.AddJob("@every 5s", compositionRoot.NewMoveCouriersJob())
+	_, err = c.AddJob("@every 1s", compositionRoot.NewMoveCouriersJob())
 	if err != nil {
 		log.Fatalf("ошибка при добавлении задачи: %v", err)
 	}
-	_, err = c.AddJob("@every 4s", compositionRoot.NewOutboxJob())
+	_, err = c.AddJob("@every 2s", compositionRoot.NewOutboxJob())
 	if err != nil {
 		log.Fatalf("ошибка при добавлении задачи: %v", err)
 	}
