@@ -22,6 +22,7 @@ import (
 	"delivery/internal/adapters/out/postgres/orderrepo"
 	"delivery/internal/generated/servers"
 	"delivery/internal/pkg/errs"
+	"delivery/internal/pkg/outbox"
 )
 
 func main() {
@@ -169,6 +170,11 @@ func mustAutoMigrate(db *gorm.DB) {
 	if err != nil {
 		log.Fatalf("Ошибка миграции: %v", err)
 	}
+
+	err = db.AutoMigrate(&outbox.Message{})
+	if err != nil {
+		log.Fatalf("Ошибка миграции outbox: %v", err)
+	}
 }
 
 func startWebServer(compositionRoot *cmd.CompositionRoot, port string) {
@@ -247,14 +253,19 @@ func registerSwaggerUi(e *echo.Echo) {
 
 func startCron(compositionRoot *cmd.CompositionRoot) {
 	c := cron.New()
-	_, err := c.AddJob("@every 1s", compositionRoot.NewAssignOrdersJob())
+	_, err := c.AddJob("@every 5s", compositionRoot.NewAssignOrdersJob())
 	if err != nil {
 		log.Fatalf("ошибка при добавлении задачи: %v", err)
 	}
-	_, err = c.AddJob("@every 1s", compositionRoot.NewMoveCouriersJob())
+	_, err = c.AddJob("@every 5s", compositionRoot.NewMoveCouriersJob())
 	if err != nil {
 		log.Fatalf("ошибка при добавлении задачи: %v", err)
 	}
+	_, err = c.AddJob("@every 4s", compositionRoot.NewOutboxJob())
+	if err != nil {
+		log.Fatalf("ошибка при добавлении задачи: %v", err)
+	}
+
 	c.Start()
 }
 

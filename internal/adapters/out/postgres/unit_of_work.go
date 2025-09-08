@@ -9,6 +9,7 @@ import (
 	"delivery/internal/core/ports"
 	"delivery/internal/pkg/ddd"
 	"delivery/internal/pkg/errs"
+	"delivery/internal/pkg/outbox"
 
 	"github.com/labstack/gommon/log"
 	"gorm.io/gorm"
@@ -89,22 +90,34 @@ func (u *UnitOfWork) Commit(ctx context.Context) error {
 		return errs.NewValueIsRequiredError("cannot commit without transaction")
 	}
 
-	if err := u.tx.WithContext(ctx).Commit().Error; err != nil {
-		return err
-	}
+	u.committed = false
+	defer func() {
+		if !u.committed && u.tx != nil {
+			if err := u.tx.WithContext(ctx).Rollback().Error; err != nil &&
+				!errors.Is(err, gorm.ErrInvalidTransaction) {
+				log.Error(err)
+			}
+			u.clearTx()
+		}
+	}()
 
 	if err := u.publishDomainEvents(ctx); err != nil {
 		return err
 	}
 
+	if err := u.tx.WithContext(ctx).Commit().Error; err != nil {
+		return err
+	}
 	u.committed = true
 	u.clearTx()
+
 	return nil
 }
 
 func (u *UnitOfWork) RollbackUnlessCommitted(ctx context.Context) {
 	if u.tx != nil && !u.committed {
-		if err := u.tx.WithContext(ctx).Rollback().Error; err != nil && !errors.Is(err, gorm.ErrInvalidTransaction) {
+		if err := u.tx.WithContext(ctx).Rollback().Error; err != nil &&
+			!errors.Is(err, gorm.ErrInvalidTransaction) {
 			log.Error(err)
 		}
 		u.clearTx()
@@ -118,15 +131,17 @@ func (u *UnitOfWork) clearTx() {
 }
 
 func (u *UnitOfWork) publishDomainEvents(ctx context.Context) error {
-	for _, aggregate := range u.trackedAggregates {
-		for _, event := range aggregate.GetDomainEvents() {
-			err := u.mediatr.Publish(ctx, event)
-			if err != nil {
-				log.Error(err)
-				continue
+	for _, agg := range u.trackedAggregates {
+		outboxEvents, err := outbox.EncodeDomainEvents(agg.GetDomainEvents())
+		if err != nil {
+			return err
+		}
+		if len(outboxEvents) > 0 {
+			if err := u.tx.WithContext(ctx).Create(&outboxEvents).Error; err != nil {
+				return err
 			}
 		}
-		aggregate.ClearDomainEvents()
+		agg.ClearDomainEvents()
 	}
 	return nil
 }
