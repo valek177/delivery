@@ -22,6 +22,7 @@ import (
 	"delivery/internal/adapters/out/postgres/orderrepo"
 	"delivery/internal/generated/servers"
 	"delivery/internal/pkg/errs"
+	"delivery/internal/pkg/outbox"
 )
 
 func main() {
@@ -169,6 +170,11 @@ func mustAutoMigrate(db *gorm.DB) {
 	if err != nil {
 		log.Fatalf("Ошибка миграции: %v", err)
 	}
+
+	err = db.AutoMigrate(&outbox.Message{})
+	if err != nil {
+		log.Fatalf("Ошибка миграции outbox: %v", err)
+	}
 }
 
 func startWebServer(compositionRoot *cmd.CompositionRoot, port string) {
@@ -255,6 +261,11 @@ func startCron(compositionRoot *cmd.CompositionRoot) {
 	if err != nil {
 		log.Fatalf("ошибка при добавлении задачи: %v", err)
 	}
+	_, err = c.AddJob("@every 2s", compositionRoot.NewOutboxJob())
+	if err != nil {
+		log.Fatalf("ошибка при добавлении задачи: %v", err)
+	}
+
 	c.Start()
 }
 
